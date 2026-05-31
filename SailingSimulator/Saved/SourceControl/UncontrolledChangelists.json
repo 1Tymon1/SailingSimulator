@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Content/VRTemplate/VRTemplateMap_BuiltData.uasset",
+				"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Content/VRTemplate/VRTemplateMap.umap",
+				"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Content/blueprints/WindController.uasset",
+				"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Content/materials/MPC_Ocean.uasset"
+			]
+		}
+	]
+}

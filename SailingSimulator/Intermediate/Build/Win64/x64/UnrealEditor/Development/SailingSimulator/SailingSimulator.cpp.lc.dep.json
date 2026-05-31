@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\tymon\\desktop\\studia\\projekt badawczy\\sailingsimulator\\sailingsimulator\\source\\sailingsimulator\\sailingsimulator.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\tymon\\desktop\\studia\\projekt badawczy\\sailingsimulator\\sailingsimulator\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\tymon\\desktop\\studia\\projekt badawczy\\sailingsimulator\\sailingsimulator\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\sailingsimulator\\definitions.sailingsimulator.h",
+            "c:\\users\\tymon\\desktop\\studia\\projekt badawczy\\sailingsimulator\\sailingsimulator\\source\\sailingsimulator\\sailingsimulator.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,15 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-SailingSimulator.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/MyClass.cpp.obj"
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/SailingSimulator.cpp.obj"
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/WaveSetter.cpp.obj"
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/PerModuleInline.gen.cpp.obj"
+"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/Default.rc2.res"
+/OUT:"C:/Users/tymon/Desktop/studia/projekt badawczy/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/UnrealEditor/Development/SailingSimulator/UnrealEditor-SailingSimulator.lib"

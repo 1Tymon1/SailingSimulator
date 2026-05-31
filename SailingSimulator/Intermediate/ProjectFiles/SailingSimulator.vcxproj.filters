@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\.vsconfig" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config\Android">
+      <UniqueIdentifier>{1797D593-7CC5-3812-9193-8AAD12A3DA98}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Android\AndroidEngine.ini">
+      <Filter>Config\Android</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Config\Mac">
+      <UniqueIdentifier>{C34A53DE-7A2E-391F-9292-A84444E41B18}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Mac\MacEngine.ini">
+      <Filter>Config\Mac</Filter>
+    </None>
+    <Filter Include="Config\VisionOS">
+      <UniqueIdentifier>{54FB6262-BE34-3FD1-8608-DAEF798947B6}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\VisionOS\VisionOSDeviceProfiles.ini">
+      <Filter>Config\VisionOS</Filter>
+    </None>
+    <None Include="..\..\Config\VisionOS\VisionOSEngine.ini">
+      <Filter>Config\VisionOS</Filter>
+    </None>
+    <None Include="..\..\SailingSimulator.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\SailingSimulator.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\SailingSimulatorEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Source\SailingSimulator">
+      <UniqueIdentifier>{05886851-D79C-3E49-9BBA-1FDE28301C82}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\SailingSimulator\MyClass.cpp">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\SailingSimulator\MyClass.h">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\SailingSimulator\SailingSimulator.Build.cs">
+      <Filter>Source\SailingSimulator</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\SailingSimulator\SailingSimulator.cpp">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\SailingSimulator\SailingSimulator.h">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\SailingSimulator\WaveSetter.cpp">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\SailingSimulator\WaveSetter.h">
+      <Filter>Source\SailingSimulator</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

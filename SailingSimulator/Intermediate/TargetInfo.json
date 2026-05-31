@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "SailingSimulator",
+			"Path": "..\\Source\\SailingSimulator.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "SailingSimulatorEditor",
+			"Path": "..\\Source\\SailingSimulatorEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
