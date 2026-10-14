@@ -16,8 +16,8 @@ ASailingBoat::ASailingBoat()
     BoatMesh->SetLinearDamping(LinearDamping);
     BoatMesh->SetAngularDamping(AngularDamping);
 
-	BoatMesh->GetBodyInstance()->bLockXRotation = true;
-    BoatMesh->GetBodyInstance()->bLockYRotation = true;
+	// BoatMesh->GetBodyInstance()->bLockXRotation = true;
+ //    BoatMesh->GetBodyInstance()->bLockYRotation = true;
 }
 
 // Called when the game starts or when spawned
@@ -34,14 +34,14 @@ void ASailingBoat::Tick(float DeltaTime)
 
 	ApplyDrive(DeltaTime);
 	ApplySpeedLimit();
-	ApplyRocking(DeltaTime);
+	// ApplyRocking(DeltaTime);
 	// ApplyBuoyancy(DeltaTime);
 }
 
 void ASailingBoat::SetDriveInput(float Steering, float Throttle)
 {
     SteeringInput = FMath::Clamp(Steering, -1.0f, 1.0f);
-    ThrottleInput = FMath::Clamp(Throttle,  0.0f, 1.0f);
+    ThrottleInput = FMath::Clamp(0.0f, Throttle, 0.0f);
 }
 
 void ASailingBoat::ApplyDrive(float DeltaTime)
@@ -61,23 +61,23 @@ void ASailingBoat::ApplyDrive(float DeltaTime)
         GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Green, Msg);
     }
 
-    if (!FMath::IsNearlyZero(SteeringInput))
-    {
-        float Speed = BoatMesh->GetPhysicsLinearVelocity().Size();
-        float SteerEfficiency = FMath::Clamp(Speed / 300.0f, 0.0f, 1.0f);
-        FVector TurnTorque = FVector(0.0f, 0.0f, SteeringInput * MaxTurnTorque * SteerEfficiency);
-        BoatMesh->AddTorqueInDegrees(TurnTorque);
+    // if (!FMath::IsNearlyZero(SteeringInput))
+    // {
+    //     float Speed = BoatMesh->GetPhysicsLinearVelocity().Size();
+    //     float SteerEfficiency = FMath::Clamp(Speed / 300.0f, 0.0f, 1.0f);
+    //     FVector TurnTorque = FVector(0.0f, 0.0f, SteeringInput * MaxTurnTorque * SteerEfficiency);
+    //     BoatMesh->AddTorqueInDegrees(TurnTorque);
 
-        // Print — skręt i efektywność
-        FString Msg = FString::Printf(TEXT("Skret: %.2f | Efektywnosc: %.2f | Predkosc: %.1f"), 
-            SteeringInput, 
-            SteerEfficiency,
-            Speed);
-        GEngine->AddOnScreenDebugMessage(2, 0.0f, FColor::Yellow, Msg);
-    }
+    //     Print — skręt i efektywność
+    //     FString Msg = FString::Printf(TEXT("Skret: %.2f | Efektywnosc: %.2f | Predkosc: %.1f"), 
+    //         SteeringInput, 
+    //         SteerEfficiency,
+    //         Speed);
+    //     GEngine->AddOnScreenDebugMessage(2, 0.0f, FColor::Yellow, Msg);
+    // }
 
     // Print zawsze — Yaw i prędkość
-    FString Always = FString::Printf(TEXT("Yaw: %.1f | Predkosc: %.1f | Throttle: %.2f"), 
+    FString Always = FString::Printf(TEXT("TEST12 Yaw: %.1f | Predkosc: %.1f | Throttle: %.2f"), 
         GetActorRotation().Yaw,
         BoatMesh->GetPhysicsLinearVelocity().Size(),
         ThrottleInput);

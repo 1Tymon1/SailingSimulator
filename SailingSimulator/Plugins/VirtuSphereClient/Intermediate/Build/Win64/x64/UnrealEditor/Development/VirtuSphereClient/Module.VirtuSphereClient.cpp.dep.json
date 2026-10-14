@@ -1,0 +1,35 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\virtusphereclient\\module.virtusphereclient.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\projekty\\sailingsimulator\\sailingsimulator\\intermediate\\build\\win64\\x64\\sailingsimulatoreditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.inclorderunreal5_4.h.pch",
+        "Includes": [
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\virtusphereclient\\definitions.virtusphereclient.h",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\unrealeditor\\inc\\virtusphereclient\\uht\\avirtuspherecontroller.gen.cpp",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\source\\virtusphereclient\\public\\avirtuspherecontroller.h",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\functional",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\unordered_map",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\xhash",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\cmath",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\list",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\xpolymorphic_allocator.h",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\vector",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\__msvc_bit_utils.hpp",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\__msvc_sanitizer_annotate_container.hpp",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\xbit_ops.h",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\xstring",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\__msvc_string_view.hpp",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\include\\xnode_handle.h",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\source\\virtusphereclient\\public\\virtusphereclientstructs.h",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\unrealeditor\\inc\\virtusphereclient\\uht\\virtusphereclientstructs.generated.h",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\unrealeditor\\inc\\virtusphereclient\\uht\\avirtuspherecontroller.generated.h",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\unrealeditor\\inc\\virtusphereclient\\uht\\virtusphereclient.init.gen.cpp",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\unrealeditor\\inc\\virtusphereclient\\uht\\virtusphereclientstructs.gen.cpp",
+            "d:\\projekty\\sailingsimulator\\sailingsimulator\\plugins\\virtusphereclient\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\virtusphereclient\\permoduleinline.gen.cpp",
+            "d:\\programy\\unrealengine\\ue_5.7\\engine\\source\\runtime\\core\\public\\hal\\permoduleinline.inl"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,16 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-VirtuSphereClient.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:/Projekty/SailingSimulator/SailingSimulator/Intermediate/Build/Win64/x64/SailingSimulatorEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.InclOrderUnreal5_4.h.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/Module.VirtuSphereClient.cpp.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/AVirtuSphereController.cpp.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/VirtuSphereClient.cpp.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/VirtuSphereCommon.cpp.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/VirtuSphereDllHost.cpp.obj"
+"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/Default.rc2.res"
+/OUT:"D:/Projekty/SailingSimulator/SailingSimulator/Plugins/VirtuSphereClient/Intermediate/Build/Win64/x64/UnrealEditor/Development/VirtuSphereClient/UnrealEditor-VirtuSphereClient.lib"

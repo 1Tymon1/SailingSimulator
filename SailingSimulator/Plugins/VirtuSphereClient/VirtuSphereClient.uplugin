@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 3,
+	"VersionName": "1.2",
+	"FriendlyName": "VirtuSphereClient",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "Michał Barański, Immersive 3D Visualization Lab, Gdańsk University of Technology",
+	"CreatedByURL": "https://eti.pg.edu.pl/lzwp",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "VirtuSphereClient",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

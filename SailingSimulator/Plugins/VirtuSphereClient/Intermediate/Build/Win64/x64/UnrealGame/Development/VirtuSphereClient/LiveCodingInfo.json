@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.VirtuSphereClient.cpp.obj": [
+			"AVirtuSphereController.gen.cpp.obj",
+			"VirtuSphereClient.init.gen.cpp.obj",
+			"VirtuSphereClientStructs.gen.cpp.obj",
+			"AVirtuSphereController.cpp.obj",
+			"VirtuSphereClient.cpp.obj",
+			"VirtuSphereCommon.cpp.obj",
+			"VirtuSphereDllHost.cpp.obj"
+		]
+	}
+}

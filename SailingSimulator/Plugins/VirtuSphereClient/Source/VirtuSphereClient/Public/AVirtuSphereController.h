@@ -1,0 +1,90 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include <functional>
+#include "VirtuSphereClientStructs.h"
+#include "AVirtuSphereController.generated.h"
+
+class VirtuSphereDllHost;
+
+UCLASS()
+class VIRTUSPHERECLIENT_API AVirtuSphereController : public AActor
+{
+	GENERATED_BODY()
+
+private:
+	VirtuSphereDllHost* dllHost;
+	std::function<void(int)> connectionStateChangeListener;
+	std::function<void(void*)> spherePoseEventListener;
+	std::function<void(void*)> controllerStateEventListener;
+	std::function<void(void*)> motorStateEventListener;
+
+public:
+	// Sets default values for this actor's properties
+	AVirtuSphereController();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void OnConnected_Implementation();
+	virtual void OnDisconnected_Implementation();
+	virtual void OnSpherePose_Implementation(FSpherePoseEvent event);
+	virtual void OnControllerState_Implementation(FControllerStateEvent event);
+	virtual void OnMotorState_Implementation(FMotorStateEvent event);
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Connect to VirtuSphere", Keywords = "VirtuSphereClient connect"), Category = "VirtuSphereClient")
+	void Connect(FString host = "127.0.0.1", int port = 4445);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Disconnect from VirtuSphere", Keywords = "VirtuSphereClient disconnect"), Category = "VirtuSphereClient")
+	void Disconnect();
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Is connected", Keywords = "VirtuSphereClient isconnected"), Category = "VirtuSphereClient")
+	bool IsConnected();
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get current ping", Keywords = "VirtuSphereClient ping"), Category = "VirtuSphereClient")
+	float GetCurrentPing();
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request SpherePose events", Keywords = "VirtuSphereClient pose"), Category = "VirtuSphereClient")
+	void RequestSpherePoseUpdates(int sendRate = 10);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request ControllerState events", Keywords = "VirtuSphereClient controller state"), Category = "VirtuSphereClient")
+	void RequestControllerStateUpdates(int sendRate = 10);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request MotorState events", Keywords = "VirtuSphereClient motor state"), Category = "VirtuSphereClient")
+	void RequestMotorStateUpdates(int sendRate = 10);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set sphere pose", Keywords = "VirtuSphereClient set pose"), Category = "VirtuSphereClient")
+	void SetSpherePose(float velocity, float direction);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set sphere vector", Keywords = "VirtuSphereClient set vector"), Category = "VirtuSphereClient")
+	void SetSphereVector(float vx, float vy, float wz);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set motor power", Keywords = "VirtuSphereClient set power"), Category = "VirtuSphereClient")
+	void SetMotorPower(bool enabled);
+
+
+	UFUNCTION(BlueprintNativeEvent, Category = "VirtuSphereClient")
+	void OnConnected();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "VirtuSphereClient")
+	void OnDisconnected();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "VirtuSphereClient")
+	void OnSpherePose(FSpherePoseEvent event);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "VirtuSphereClient")
+	void OnControllerState(FControllerStateEvent event);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "VirtuSphereClient")
+	void OnMotorState(FMotorStateEvent event);
+};
