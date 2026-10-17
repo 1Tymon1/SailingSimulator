@@ -165,8 +165,18 @@ void ASailingBoat_v2::SetThrottle(float value){
 	ThrottleInput = FMath::Clamp(value, -1.0f, 1.0f);
 }
 
+void ASailingBoat_v2::UpdateSteeringValue(){
+    if(!FMath::IsNearlyZero(KeyboardSteeringInput)){
+        SteeringInput = KeyboardSteeringInput;
+    }
+    else{
+        SteeringInput = SteeringWheelInput;
+    }
+}
+
 void ASailingBoat_v2::SetSteering(float value){
-	SteeringInput = FMath::Clamp(value, -1.0f, 1.0f);
+    KeyboardSteeringInput = FMath::Clamp(value, -1.0f, 1.0f);
+	UpdateSteeringValue(); 
 }
 
 void ASailingBoat_v2::SetSteeringWheelAngle(float NewAngle){
@@ -178,9 +188,9 @@ void ASailingBoat_v2::SetSteeringWheelAngle(float NewAngle){
 
     SteeringWheelPivot->SetRelativeRotation(FRotator(SteeringWheelAngle, 0.0f, 0.0f));
 
-    const float SteeringValue = MaxSteeringWheelAngle > 0.0f ? SteeringWheelAngle / MaxSteeringWheelAngle : 0.0f;
+    SteeringWheelInput = MaxSteeringWheelAngle > 0.0f ? SteeringWheelAngle / MaxSteeringWheelAngle : 0.0f;
 
-    SetSteering(SteeringValue);
+    UpdateSteeringValue();
 }
 
 float ASailingBoat_v2::GetSteeringWheelAngle()

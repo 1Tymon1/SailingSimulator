@@ -65,6 +65,8 @@ private:
 	float DesiredYaw = 0.0f;
 
 	float SteeringWheelAngle = 0.0f;
+	float KeyboardSteeringInput = 0.0f;
+	float SteeringWheelInput = 0.0f;
 
 	void ApplyDrive(float DeltaTime);
 	void ApplySpeedLimit();
@@ -72,4 +74,6 @@ private:
 	void UpdatePlayerPosition(float DeltaTime);
 	void DrawPontoons();
 	void LockYawFromPlayer();
+
+	void UpdateSteeringValue();
 };
