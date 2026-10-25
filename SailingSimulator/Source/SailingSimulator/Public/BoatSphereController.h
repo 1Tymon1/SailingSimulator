@@ -27,7 +27,8 @@ private:
 	float SendTimer = 0.0f;
 	float ReconnectTimer = 0.0f;
 
-	void TryConnect();
+	FVector PlayerWalkVector = FVector::ZeroVector;
+
 	void FindBoat();
 	void SendBoatDataToSphere(float DeltaTime);
 };

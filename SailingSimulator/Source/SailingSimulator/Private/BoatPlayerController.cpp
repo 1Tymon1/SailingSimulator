@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "BoatPlayerController.h"
 #include "SailingBoat_v2.h"
 #include "GameFramework/Character.h"
@@ -8,13 +5,21 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 
 ABoatPlayerController::ABoatPlayerController(){
 	bShowMouseCursor = false;
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void ABoatPlayerController::BeginPlay(){
 	Super::BeginPlay();
+    bShowMouseCursor = false;
+
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			TEXT("BoatPlayerController: BeginPlay")
@@ -85,19 +90,6 @@ void ABoatPlayerController::BeginPlay(){
 			}
 
 			APawn* MyPawn = GetPawn();
-			// if(MyPawn){
-			// 	FVector BoatLocation = BoatRef->GetActorLocation();
-			// 	FVector SpawnOffset = FVector(0.0f, -20.0f, 100.0f);
-			// 	MyPawn->SetActorLocation(BoatLocation + SpawnOffset);
-
-			// 	MyPawn->AttachToActor(BoatRef, FAttachmentTransformRules::KeepWorldTransform);
-			// 	MyPawn->AttachToComponent(BoatRef->BoatMesh, FAttachmentTransformRules(
-			// 		EAttachmentRule::KeepWorld,
-			// 		EAttachmentRule::KeepWorld,
-			// 		EAttachmentRule::KeepWorld,
-			// 		true
-			// 	));
-			// }
 		}
 		else{
 			if (GEngine) {
@@ -105,23 +97,66 @@ void ABoatPlayerController::BeginPlay(){
 			}
 		}
 	}, 0.5f, false);
-	
-    // bShowMouseCursor = false;
 
-    // FInputModeGameAndUI InputMode;
-    // InputMode.SetHideCursorDuringCapture(false);
-    // InputMode.SetLockMouseToViewportBehavior(
-    //     EMouseLockMode::DoNotLock
-    // );
+    if (!HandCursorWidgetClass)
+    {
+        if (GEngine) {
+            GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("HandCursorWidgetClass is not assigned!"));
+        }
+        return;
+    }
 
-    // SetInputMode(InputMode);
+    HandCursorWidget = CreateWidget<UUserWidget>(this, HandCursorWidgetClass);
+
+    if (!HandCursorWidget)
+    {
+        if (GEngine) {
+            GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Failed to create HandCursorWidget!"));
+        }
+        return;
+    }
+
+    
+    HandCursorWidget->AddToViewport(200);
+
+    HandCursorWidget->SetPositionInViewport(
+        FVector2D(0.0f, 0.0f)
+    );
+
+    HandCursorWidget->SetDesiredSizeInViewport(
+        FVector2D(1920.0f, 1080.0f)
+    );
+
+    if (GEngine && GEngine->GameViewport)
+    {
+        FVector2D ViewportSize;
+
+        GEngine->GameViewport->GetViewportSize(ViewportSize);
+
+        HandCursorWidget->SetDesiredSizeInViewport(ViewportSize);
+    }
+
+    HandIconImage = Cast<UImage>(HandCursorWidget->GetWidgetFromName(TEXT("HandImage")));
+
+    if (!HandIconImage)
+    {
+        if (GEngine) {
+            GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Could not find Image named HandImage!"));
+        }
+        return;
+    }
+
+    SetHandCursorState(EHandCursorState::Neutral);
 }
 
 void ABoatPlayerController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if(bIsPaused) return;
+
     UpdateBoatCameraMotion(DeltaTime);
     UpdateSteeringWheelDrag();
+    UpdateHandCursor();
 }
 
 void ABoatPlayerController::SetupInputComponent(){
@@ -140,6 +175,10 @@ void ABoatPlayerController::SetupInputComponent(){
     InputComponent->BindAction("GrabSteeringWheel", IE_Released, this, &ABoatPlayerController::EndSteeringWheelDrag);
 
     InputComponent->BindKey(EKeys::E, IE_Pressed, this, &ABoatPlayerController::ToggleSteeringInteractionMode);
+
+    FInputKeyBinding& PauseBinding = InputComponent->BindKey(EKeys::Q, IE_Pressed, this, &ABoatPlayerController::TogglePause);
+
+    PauseBinding.bExecuteWhenPaused = true;
 }
 
 void ABoatPlayerController::MoveForward(float value){
@@ -201,10 +240,7 @@ void ABoatPlayerController::BeginSteeringWheelDrag()
 
     FHitResult Hit;
 
-    if (!GetHitResultUnderCursor(
-        ECC_Visibility,
-        true,
-        Hit))
+    if (!GetHitResultUnderCursor(ECC_Visibility, true, Hit))
     {
         if (GEngine)
         {
@@ -231,8 +267,7 @@ void ABoatPlayerController::BeginSteeringWheelDrag()
         );
     }
 
-    ASailingBoat_v2* HitBoat =
-        Cast<ASailingBoat_v2>(HitActor);
+    ASailingBoat_v2* HitBoat = Cast<ASailingBoat_v2>(HitActor);
 
     if (!HitBoat)
     {
@@ -246,8 +281,7 @@ void ABoatPlayerController::BeginSteeringWheelDrag()
         return;
     }
 
-    if (!HitComponent ||
-        HitComponent != HitBoat->SteeringWheelHitbox)
+    if (!HitComponent || HitComponent != HitBoat->SteeringWheelHitbox)
     {
         if (GEngine)
         {
@@ -264,6 +298,7 @@ void ABoatPlayerController::BeginSteeringWheelDrag()
 
     SteeringBoatRef = HitBoat;
     bIsSteeringWheelDragging = true;
+    SetHandCursorState(EHandCursorState::Grabbing);
 
     if (GEngine)
     {
@@ -278,6 +313,7 @@ void ABoatPlayerController::EndSteeringWheelDrag()
 {
     bIsSteeringWheelDragging = false;
     SteeringBoatRef = nullptr;
+    SetHandCursorState(EHandCursorState::Neutral);
 }
 
 void ABoatPlayerController::UpdateSteeringWheelDrag()
@@ -297,12 +333,101 @@ void ABoatPlayerController::UpdateSteeringWheelDrag()
         return;
     }
 
-    const float NewAngle =
-        SteeringBoatRef->GetSteeringWheelAngle()
-        + MouseX * MouseSteeringSensitivity;
+    const float NewAngle = SteeringBoatRef->GetSteeringWheelAngle() + MouseX * MouseSteeringSensitivity;
 
     SteeringBoatRef->SetSteeringWheelAngle(NewAngle);
 }
+
+void ABoatPlayerController::SetHandCursorState(EHandCursorState NewState)
+{
+    if (HandCursorState == NewState && HandIconImage)
+    {
+        return;
+    }
+
+    HandCursorState = NewState;
+
+    if (!HandIconImage)
+    {
+        return;
+    }
+
+    UTexture2D* TextureToUse = CursorDotTexture;
+
+    switch (HandCursorState)
+    {
+        case EHandCursorState::Hover:
+            TextureToUse = CursorOpenHandTexture;
+            break;
+
+        case EHandCursorState::Grabbing:
+            TextureToUse = CursorClosedHandTexture;
+            break;
+
+        case EHandCursorState::Neutral:
+        default:
+            TextureToUse = CursorDotTexture;
+            break;
+    }
+
+    if (TextureToUse)
+    {
+        HandIconImage->SetBrushFromTexture(TextureToUse);
+    }
+}
+
+void ABoatPlayerController::UpdateHandCursor()
+{
+    if (!HandCursorWidget || !HandIconImage)
+    {
+        return;
+    }
+
+    if (!bSteeringInteractionMode && !bIsPaused)
+    {
+        HandCursorWidget->SetVisibility(ESlateVisibility::Collapsed);
+        return;
+    }
+
+    HandCursorWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+    if (bIsSteeringWheelDragging && SteeringBoatRef)
+    {
+        SetHandCursorState(EHandCursorState::Grabbing);
+    }
+
+    else if (bIsPaused)
+    {
+        SetHandCursorState(EHandCursorState::Neutral);
+    }
+    else
+    {
+        FHitResult Hit;
+        bool bIsHoveringSteeringWheel = false;
+
+        if (GetHitResultUnderCursor(ECC_Visibility, true, Hit))
+        {
+            ASailingBoat_v2* HitBoat = Cast<ASailingBoat_v2>(Hit.GetActor());
+
+            if (HitBoat &&
+                Hit.GetComponent() == HitBoat->SteeringWheelHitbox)
+            {
+                bIsHoveringSteeringWheel = true;
+            }
+        }
+
+        SetHandCursorState(bIsHoveringSteeringWheel ? EHandCursorState::Hover : EHandCursorState::Neutral);
+    }
+
+    float MouseX = 0.0f;
+    float MouseY = 0.0f;
+
+    if (GetMousePosition(MouseX, MouseY))
+    {
+        HandCursorWidget->SetPositionInViewport(FVector2D(MouseX, MouseY), false);
+    }
+}
+
 
 void ABoatPlayerController::ToggleSteeringInteractionMode()
 {
@@ -310,7 +435,6 @@ void ABoatPlayerController::ToggleSteeringInteractionMode()
 
     if (bSteeringInteractionMode)
     {
-        // Tryb obs≥ugi ko≥a sterniczego
         bShowMouseCursor = true;
 
         FInputModeGameAndUI InputMode;
@@ -323,7 +447,6 @@ void ABoatPlayerController::ToggleSteeringInteractionMode()
     }
     else
     {
-        // Normalne sterowanie kamerπ
         EndSteeringWheelDrag();
 
         bShowMouseCursor = false;
@@ -333,45 +456,98 @@ void ABoatPlayerController::ToggleSteeringInteractionMode()
     }
 }
 
+void ABoatPlayerController::TogglePause()
+{
+    if (!bIsPaused)
+    {
+        // Stop simulation
+        bIsPaused = true;
+        EndSteeringWheelDrag();
+
+        if (!PauseWidget && PauseWidgetClass)
+        {
+            PauseWidget = CreateWidget<UUserWidget>(
+                this,
+                PauseWidgetClass
+            );
+        }
+
+        if (PauseWidget)
+        {
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(
+                    -1, 3.0f, FColor::Green,
+                    TEXT("FAIL: PauseWidgetClass is assigned!")
+                );
+            }
+            PauseWidget->AddToViewport(100);
+        }
+        else
+        {
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(
+                    -1, 3.0f, FColor::Red,
+                    TEXT("FAIL: PauseWidgetClass is not assigned!")
+                );
+            }
+        }
+
+        bShowMouseCursor = true;
+
+        FInputModeGameAndUI InputMode;
+        InputMode.SetHideCursorDuringCapture(false);
+        InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+        SetInputMode(InputMode);
+
+        UGameplayStatics::SetGamePaused(GetWorld(), true);
+    }
+    else
+    {
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        bIsPaused = false;
+
+        if (PauseWidget)
+        {
+            PauseWidget->RemoveFromParent();
+        }
+
+        if (bSteeringInteractionMode)
+        {
+            bShowMouseCursor = true;
+
+            FInputModeGameAndUI InputMode;
+            InputMode.SetHideCursorDuringCapture(false);
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            SetInputMode(InputMode);
+        }
+        else
+        {
+            bShowMouseCursor = false;
+
+            FInputModeGameOnly InputMode;
+            SetInputMode(InputMode);
+        }
+    }
+}
+
+
 void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
 {
-    if (!BoatRef ||
-        !BoatRef->BuoyancyComponent ||
-        !CameraPivot)
+    if (!BoatRef || !BoatRef->BuoyancyComponent || !CameraPivot)
     {
         return;
     }
 
-    // =========================================================
-    // 1. TRANSFORM £ODZI
-    //
-    // Uøywamy ActorTransform, poniewaø Twoje pontony sπ
-    // liczone wzglÍdem ActorTransform w DrawPontoons().
-    // =========================================================
+    const FTransform BoatTransform = BoatRef->GetActorTransform();
+    const FVector BoatForward = BoatTransform.GetUnitAxis(EAxis::X);
+    const FVector BoatRight = BoatTransform.GetUnitAxis(EAxis::Y);
+    const FVector BoatUp = BoatTransform.GetUnitAxis(EAxis::Z);
 
-    const FTransform BoatTransform =
-        BoatRef->GetActorTransform();
-
-    const FVector BoatForward =
-        BoatTransform.GetUnitAxis(EAxis::X);
-
-    const FVector BoatRight =
-        BoatTransform.GetUnitAxis(EAxis::Y);
-
-    const FVector BoatUp =
-        BoatTransform.GetUnitAxis(EAxis::Z);
-
-
-    // =========================================================
-    // 2. ZNAJDè GRANICE £ODZI NA PODSTAWIE PONTON”W
-    //
-    // X = przÛd / ty≥
-    // Y = lewa / prawa burta
-    // =========================================================
-
+    // Boat boarders
     float MinPontoonX = TNumericLimits<float>::Max();
     float MaxPontoonX = TNumericLimits<float>::Lowest();
-
     float MinPontoonY = TNumericLimits<float>::Max();
     float MaxPontoonY = TNumericLimits<float>::Lowest();
 
@@ -380,40 +556,17 @@ void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
     for (const FSphericalPontoon& Pontoon :
          BoatRef->BuoyancyComponent->BuoyancyData.Pontoons)
     {
-        const FVector LocalPosition =
-            Pontoon.RelativeLocation;
+        const FVector LocalPosition = Pontoon.RelativeLocation;
 
-        MinPontoonX =
-            FMath::Min(
-                MinPontoonX,
-                LocalPosition.X
-            );
-
-        MaxPontoonX =
-            FMath::Max(
-                MaxPontoonX,
-                LocalPosition.X
-            );
-
-        MinPontoonY =
-            FMath::Min(
-                MinPontoonY,
-                LocalPosition.Y
-            );
-
-        MaxPontoonY =
-            FMath::Max(
-                MaxPontoonY,
-                LocalPosition.Y
-            );
+        MinPontoonX = FMath::Min(MinPontoonX, LocalPosition.X);
+        MaxPontoonX = FMath::Max(MaxPontoonX, LocalPosition.X);
+        MinPontoonY = FMath::Min(MinPontoonY, LocalPosition.Y);
+        MaxPontoonY = FMath::Max(MaxPontoonY, LocalPosition.Y);
 
         bFoundPontoons = true;
     }
 
-    if (!bFoundPontoons)
-    {
-        return;
-    }
+    if (!bFoundPontoons) return;
 
 
     // =========================================================
@@ -430,26 +583,14 @@ void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
     // Y > 0  = prawa burta
     // =========================================================
 
-    const FVector CameraWorldLocation =
-        CameraPivot->GetComponentLocation();
+    const FVector CameraWorldLocation = CameraPivot->GetComponentLocation();
+    const FVector CameraLocalLocation = BoatTransform.InverseTransformPosition(CameraWorldLocation);
 
-    const FVector CameraLocalLocation =
-        BoatTransform.InverseTransformPosition(
-            CameraWorldLocation
-        );
+    const float PontoonCenterX = (MinPontoonX + MaxPontoonX) * 0.5f;
+    const float PontoonCenterY = (MinPontoonY + MaxPontoonY) * 0.5f;
 
 
-    // =========================================================
-    // 4. åRODEK OBSZARU PONTON”W
-    // =========================================================
-
-    const float PontoonCenterX =
-        (MinPontoonX + MaxPontoonX) * 0.5f;
-
-    const float PontoonCenterY =
-        (MinPontoonY + MaxPontoonY) * 0.5f;
-
-
+    
     // =========================================================
     // 5. PO£OØENIE KAMERY WZGL DEM åRODKA £ODZI
     //
@@ -466,42 +607,24 @@ void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
     // +1 = prawa burta
     // =========================================================
 
-    const float HalfBoatLength =
-        (MaxPontoonX - MinPontoonX) * 0.5f;
-
-    const float HalfBoatWidth =
-        (MaxPontoonY - MinPontoonY) * 0.5f;
+    const float HalfBoatLength = (MaxPontoonX - MinPontoonX) * 0.5f;
+    const float HalfBoatWidth = (MaxPontoonY - MinPontoonY) * 0.5f;
 
     float CameraLongitudinalFactor = 0.0f;
     float CameraLateralFactor = 0.0f;
 
     if (!FMath::IsNearlyZero(HalfBoatLength))
     {
-        CameraLongitudinalFactor =
-            (CameraLocalLocation.X - PontoonCenterX)
-            / HalfBoatLength;
+        CameraLongitudinalFactor = (CameraLocalLocation.X - PontoonCenterX) / HalfBoatLength;
     }
 
     if (!FMath::IsNearlyZero(HalfBoatWidth))
     {
-        CameraLateralFactor =
-            (CameraLocalLocation.Y - PontoonCenterY)
-            / HalfBoatWidth;
+        CameraLateralFactor = (CameraLocalLocation.Y - PontoonCenterY) / HalfBoatWidth;
     }
 
-    CameraLongitudinalFactor =
-        FMath::Clamp(
-            CameraLongitudinalFactor,
-            -1.0f,
-            1.0f
-        );
-
-    CameraLateralFactor =
-        FMath::Clamp(
-            CameraLateralFactor,
-            -1.0f,
-            1.0f
-        );
+    CameraLongitudinalFactor = FMath::Clamp(CameraLongitudinalFactor, -1.0f, 1.0f);
+    CameraLateralFactor = FMath::Clamp(CameraLateralFactor, -1.0f, 1.0f);
 
 
     // =========================================================
@@ -514,165 +637,35 @@ void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
     // delikatny, a mocniej zaczyna dzia≥aÊ bliøej krawÍdzi.
     // =========================================================
 
-    const float CameraLateralStrength =
-        FMath::Pow(
-            FMath::Abs(CameraLateralFactor),
-            0.5f
-        );
+    const float CameraLateralStrength =FMath::Pow(FMath::Abs(CameraLateralFactor), 0.5f);
+    const float CameraLongitudinalStrength = FMath::Pow(FMath::Abs(CameraLongitudinalFactor), 0.5f);
 
-    const float CameraLongitudinalStrength =
-        FMath::Pow(
-            FMath::Abs(CameraLongitudinalFactor),
-            0.5f
-        );
+    const FRotator CurrentControlRotation = GetControlRotation();
+    const FRotationMatrix CameraRotationMatrix(CurrentControlRotation);
 
+    const FVector CameraForward = CameraRotationMatrix.GetUnitAxis(EAxis::X);
+    const FVector CameraRight = CameraRotationMatrix.GetUnitAxis(EAxis::Y);
+    const FVector CameraUp = CameraRotationMatrix.GetUnitAxis(EAxis::Z);
 
-    // =========================================================
-    // 7. CONTROL ROTATION
-    //
-    // To jest normalne sterowanie kamerπ myszkπ.
-    // =========================================================
-
-    const FRotator CurrentControlRotation =
-        GetControlRotation();
-
-
-    // =========================================================
-    // 8. OSIE KAMERY
-    //
-    // DziÍki temu przechy≥ ≥odzi jest interpretowany wzglÍdem
-    // tego, gdzie aktualnie patrzy gracz.
-    // =========================================================
-
-    const FRotationMatrix CameraRotationMatrix(
-        CurrentControlRotation
-    );
-
-    const FVector CameraForward =
-        CameraRotationMatrix.GetUnitAxis(EAxis::X);
-
-    const FVector CameraRight =
-        CameraRotationMatrix.GetUnitAxis(EAxis::Y);
-
-    const FVector CameraUp =
-        CameraRotationMatrix.GetUnitAxis(EAxis::Z);
-
-
-    // =========================================================
-    // 9. G”RA £ODZI W PRZESTRZENI KAMERY
-    //
-    // To jest najwaøniejsza czÍúÊ.
-    //
-    // Nie pytamy:
-    //
-    // "ile stopni ma Roll ≥odzi?"
-    //
-    // tylko:
-    //
-    // "w ktÛrπ stronÍ przechyla siÍ ≥Ûdü wzglÍdem tego,
-    //  w ktÛrπ stronÍ patrzy gracz?"
-    // =========================================================
 
     const FVector BoatUpInCameraSpace(
-        FVector::DotProduct(
-            BoatUp,
-            CameraForward
-        ),
-
-        FVector::DotProduct(
-            BoatUp,
-            CameraRight
-        ),
-
-        FVector::DotProduct(
-            BoatUp,
-            CameraUp
-        )
+        FVector::DotProduct(BoatUp, CameraForward),
+        FVector::DotProduct(BoatUp, CameraRight),
+        FVector::DotProduct(BoatUp, CameraUp)
     );
 
-
-    // =========================================================
-    // 10. BAZOWY ROLL KAMERY
-    //
-    // Roll = przechylenie lewo/prawo.
-    //
-    // CameraRight odpowiada za boczne wychylenie.
-    // =========================================================
-
-    const float BaseCameraRoll =
-        FMath::RadiansToDegrees(
-            FMath::Atan2(
-                BoatUpInCameraSpace.Y,
-                BoatUpInCameraSpace.Z
-            )
-        );
+    const float BaseCameraRoll =FMath::RadiansToDegrees(FMath::Atan2(BoatUpInCameraSpace.Y, BoatUpInCameraSpace.Z));
+    const float BaseCameraPitch =-FMath::RadiansToDegrees(FMath::Atan2(BoatUpInCameraSpace.X, BoatUpInCameraSpace.Z));
 
 
-    // =========================================================
-    // 11. BAZOWY PITCH KAMERY
-    //
-    // Pitch = gÛra/dÛ≥.
-    // =========================================================
-
-    const float BaseCameraPitch =
-        -FMath::RadiansToDegrees(
-            FMath::Atan2(
-                BoatUpInCameraSpace.X,
-                BoatUpInCameraSpace.Z
-            )
-        );
-
-
-    // =========================================================
-    // 12. WP£YW POZYCJI KAMERY
-    //
-    // ROLL:
-    //
-    // úrodek szerokoúci ≥odzi -> 0
-    // burta -> pe≥ny efekt
-    //
-    // PITCH:
-    //
-    // úrodek d≥ugoúci -> 0
-    // dziÛb/rufa -> pe≥ny efekt
-    // =========================================================
-
-    const float PositionDependentRoll =
-        BaseCameraRoll *
-        CameraLateralStrength;
-
-    const float PositionDependentPitch =
-        BaseCameraPitch *
-        CameraLongitudinalStrength;
-
-
-    // =========================================================
-    // 13. MAKSYMALNY EFEKT
-    //
-    // Tutaj moøesz pÛüniej stroiÊ feeling kamery.
-    // =========================================================
+    const float PositionDependentRoll = BaseCameraRoll * CameraLateralStrength;
+    const float PositionDependentPitch = BaseCameraPitch * CameraLongitudinalStrength;
 
     const float MaxCameraRoll = 8.0f;
     const float MaxCameraPitch = 5.0f;
 
-    const float TargetCameraRoll =
-        FMath::Clamp(
-            PositionDependentRoll,
-            -MaxCameraRoll,
-            MaxCameraRoll
-        );
-
-    const float TargetCameraPitch =
-        FMath::Clamp(
-            PositionDependentPitch,
-            -MaxCameraPitch,
-            MaxCameraPitch
-        );
-
-
-    // =========================================================
-    // 14. WYG£ADZENIE
-    // =========================================================
+    const float TargetCameraRoll = FMath::Clamp(PositionDependentRoll,-MaxCameraRoll,MaxCameraRoll);
+    const float TargetCameraPitch = FMath::Clamp(PositionDependentPitch, -MaxCameraPitch, MaxCameraPitch);
 
     const float CameraInterpSpeed = 5.0f;
 
@@ -692,33 +685,13 @@ void ABoatPlayerController::UpdateBoatCameraMotion(float DeltaTime)
             CameraInterpSpeed
         );
 
+    FRotator FinalRotation = CurrentControlRotation;
 
-    // =========================================================
-    // 15. FINALNA ROTACJA
-    //
-    // ControlRotation = mysz
-    // CameraBoatPitch = ruch ≥odzi gÛra/dÛ≥
-    // CameraBoatRoll  = ruch ≥odzi lewo/prawo
-    // =========================================================
+    FinalRotation.Pitch += CameraBoatPitch;
 
-    FRotator FinalRotation =
-        CurrentControlRotation;
+    FinalRotation.Roll += CameraBoatRoll;
 
-    FinalRotation.Pitch +=
-        CameraBoatPitch;
-
-    FinalRotation.Roll +=
-        CameraBoatRoll;
-
-
-    CameraPivot->SetWorldRotation(
-        FinalRotation
-    );
-
-
-    // =========================================================
-    // 16. DEBUG
-    // =========================================================
+    CameraPivot->SetWorldRotation(FinalRotation);
 
     if (GEngine)
     {

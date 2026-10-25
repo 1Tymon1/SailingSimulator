@@ -14,7 +14,8 @@ public class SailingSimulator : ModuleRules
 			"Engine",
 			"InputCore",
 			"EnhancedInput",
-			"Water"
+			"Water",
+			"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
